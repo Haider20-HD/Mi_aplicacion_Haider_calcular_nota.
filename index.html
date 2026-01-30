@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Notas - Predictor con Checkboxes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #1abc9c;
+            --warning-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --sidebar-width: 250px;
+            --header-height: 70px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        /* Estilos del menú lateral */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow);
+            z-index: 10;
+        }
+
+        .logo {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo span {
+            color: var(--accent-color);
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 20px 0;
+        }
+
+        .nav-menu ul {
+            list-style: none;
+        }
+
+        .nav-menu li {
+            margin-bottom: 5px;
+        }
+
+        .nav-menu a {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: #ddd;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 1.05rem;
+        }
+
+        .nav-menu a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-menu a.active {
+            background-color: var(--secondary-color);
+            color: white;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .nav-menu i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        /* Estilos del contenido principal */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        header {
+            height: var(--header-height);
+            background-color: white;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            z-index: 5;
+        }
+
+        .header-title h2 {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .header-title p {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-top: 3px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--secondary-color);
+        }
+
+        .content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* Estilos de la calculadora */
+        .calculator-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .calculator-title {
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .calculator-title i {
+            margin-right: 10px;
+            color: var(--accent-color);
+        }
+
+        .formula-explanation {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--secondary-color);
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .formula-explanation h4 {
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .formula {
+            font-family: 'Courier New', monospace;
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .formula span {
+            color: var(--accent-color);
+        }
+
+        /* Estilos para la selección con checkboxes */
+        .checkbox-selector {
+            background-color: #f0f7ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 2px solid #d1e3f8;
+        }
+
+        .checkbox-selector h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox-selector h3 i {
+            margin-right: 10px;
+            color: var(--secondary-color);
+        }
+
+        .checkbox-instructions {
+            background-color: #e8f4fc;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .checkbox-instructions p {
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox-instructions i {
+            margin-right: 8px;
+            color: var(--secondary-color);
+        }
+
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background-color: white;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .checkbox-option:hover {
+            border-color: var(--secondary-color);
+            background-color: #f8fbff;
+        }
+
+        .checkbox-option.prediction {
+            border-color: var(--accent-color);
+            background-color: #e8f6f3;
+            box-shadow: 0 0 0 2px rgba(26, 188, 156, 0.2);
+        }
+
+        .checkbox-option input {
+            display: none;
+        }
+
+        .checkbox-custom {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #3498db;
+            border-radius: 4px;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+
+        .checkbox-option input:checked + .checkbox-custom {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+
+        .checkbox-option input:checked + .checkbox-custom::after {
+            content: '✓';
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .checkbox-option.prediction .checkbox-custom {
+            border-color: var(--accent-color);
+            background-color: rgba(26, 188, 156, 0.1);
+        }
+
+        .checkbox-option.prediction .checkbox-custom::after {
+            content: '?';
+            color: var(--accent-color);
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .option-details h4 {
+            color: var(--primary-color);
+            font-size: 1rem;
+            margin-bottom: 3px;
+        }
+
+        .option-details p {
+            color: #7f8c8d;
+            font-size: 0.85rem;
+        }
+
+        .target-grade {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #ddd;
+        }
+
+        .target-grade label {
+            font-weight: 600;
+            color: var(--primary-color);
+            white-space: nowrap;
+        }
+
+        .target-grade input {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            width: 100px;
+            transition: border-color 0.3s;
+        }
+
+        .target-grade input:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+        }
+
+        /* Estilos de formulario */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .input-group.disabled {
+            opacity: 0.6;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .input-group label .weight {
+            margin-left: 8px;
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            font-weight: normal;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .input-group input:disabled {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        .input-group input:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+        }
+
+        .input-group input.invalid {
+            border-color: var(--warning-color);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 14px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-secondary {
+            background-color: #7f8c8d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #6c7b7d;
+        }
+
+        .btn-accent {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-accent:hover {
+            background-color: #16a085;
+        }
+
+        .result-container {
+            margin-top: 30px;
+            padding: 25px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+
+        .result-container.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        .result-title {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .result-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 15px 0;
+        }
+
+        .result-message {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+
+        .info-box {
+            background-color: #e8f4fc;
+            border-left: 4px solid var(--secondary-color);
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .info-box h4 {
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Animaciones */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .logo h1, .nav-menu a span, .sidebar-footer span {
+                display: none;
+            }
+
+            .nav-menu a {
+                justify-content: center;
+                padding: 15px;
+            }
+
+            .nav-menu i {
+                margin-right: 0;
+                font-size: 1.2rem;
+            }
+
+            .checkbox-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+
+            .logo {
+                border-bottom: none;
+                border-right: 1px solid rgba(255, 255, 255, 0.1);
+                padding: 15px;
+            }
+
+            .nav-menu ul {
+                display: flex;
+            }
+
+            .nav-menu li {
+                margin-bottom: 0;
+            }
+
+            .sidebar-footer {
+                display: none;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .calculator-container {
+                padding: 20px;
+            }
+
+            .checkbox-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .form-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .header-title h2 {
+                font-size: 1.3rem;
+            }
+
+            .checkbox-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .target-grade {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Menú lateral -->
+    <nav class="sidebar">
+        <div class="logo">
+            <h1>Nota<span>Predictor</span></h1>
+        </div>
+        
+        <div class="nav-menu">
+            <ul>
+                <li>
+                    <a href="#calculadora" class="active">
+                        <i class="fas fa-calculator"></i>
+                        <span>Calculadora</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#instrucciones">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Instrucciones</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#formula">
+                        <i class="fas fa-square-root-alt"></i>
+                        <span>Fórmulas</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#historial">
+                        <i class="fas fa-history"></i>
+                        <span>Historial</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="sidebar-footer">
+            <p>© 2023 <span>Predictor de Notas</span></p>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+        <header>
+            <div class="header-title">
+                <h2>Predictor de Notas con Checkboxes</h2>
+                <p>Marca las notas que ya tienes, la que queda sin marcar será la predicción</p>
+            </div>
+            
+            <div class="user-info">
+                <div>
+                    <p>Estudiante</p>
+                    <h4>Usuario</h4>
+                </div>
+                <img src="https://ui-avatars.com/api/?name=Usuario&background=3498db&color=fff" alt="Usuario">
+            </div>
+        </header>
+        
+        <div class="content">
+            <div class="calculator-container">
+                <div class="calculator-title">
+                    <i class="fas fa-calculator"></i>
+                    <h2>Predictor de Notas con Checkboxes</h2>
+                </div>
+                
+                <div class="formula-explanation">
+                    <h4>Sistema de evaluación:</h4>
+                    <p>Cada Quiz (Q) vale 5% y cada Parcial (P) vale 20% de la nota final. La nota máxima es 5.0.</p>
+                    <p><strong>Instrucción:</strong> Marca con un ✓ las notas que ya tienes. La que quede sin marcar será la que predeciremos.</p>
+                </div>
+                
+                <!-- Selector con checkboxes -->
+                <div class="checkbox-selector">
+                    <h3><i class="fas fa-check-square"></i> Selecciona las notas que ya tienes</h3>
+                    
+                    <div class="checkbox-instructions">
+                        <p><i class="fas fa-info-circle"></i> <strong>✓ Marcado:</strong> Ya tengo esta nota (puedo ingresar su valor)</p>
+                        <p><i class="fas fa-question-circle"></i> <strong>Sin marcar:</strong> Quiero predecir esta nota (se calculará)</p>
+                    </div>
+                    
+                    <div class="checkbox-grid">
+                        <!-- Quizzes -->
+                        <div class="checkbox-option" data-item="q1">
+                            <input type="checkbox" id="have-q1" class="item-checkbox" checked>
+                            <label for="have-q1" class="checkbox-custom"></label>
+                            <div class="option-details">
+                                <h4>Quiz 1</h4>
+                                <p>5% de la nota final</p>
+                            </div>
+                        </div>
+                        
+                        <div class="checkbox-option" data-item="q2">
+                            <input type="checkbox" id="have-q2" class="item-checkbox" checked>
+                            <label for="have-q2" class="checkbox-custom"></label>
+                            <div class="option-details">
+                                <h4>Quiz 2</h4>
+                                <p>5% de la nota final</p>
+                            </div>
+                        </div>
+                        
+                        <div class="checkbox-option" data-item="q3">
+                            <input type="checkbox" id="have-q3" class="item-checkbox" checked>
+                            <label for="have-q3" class="checkbox-custom"></label>
+                            <div class="option-details">
+                                <h4>Quiz 3</h4>
+                                <p>5% de la nota final</p>
+                            </div>
+                        </div>
+                        
+                        <div class="checkbox-option" data-item="q4">
+                            <input type="checkbox" id="have-q4" class="item-checkbox" checked>
+                            <label for="have-q4" class="checkbox-custom"></label>
+                            <div class="option-details">
+                                <h4>Quiz 4</h4>
+                                <p>5% de la nota final</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Parciales -->
+                        <div class="checkbox-option" data-item="p1">
+                            <input type="checkbox" id="have-p1" class="item-checkbox" checked>
+                            <label for="have-p1" class="checkbox-custom"></label>
+                            <div class="option-details">
+                                <h4>Parcial 1</h4>
+                                <p>20% de la nota final</p>
+                            </div>
+                        </div>
+                        
+                        <div class="checkbox-option" data-item="p2">
+                            <input type="checkbox" id="have-p2" class="item-checkbox" checked>
+                            <label for="have-p2" class="checkbox-custom"></label>
+                            <div class="option-details">
+                                <h4>Parcial 2</h4>
+                                <p>20% de la nota final</p>
+                            </div>
+                        </div>
+                        
+                        <div class="checkbox-option" data-item="p3">
+                            <input type="checkbox" id="have-p3" class="item-checkbox" checked>
+                            <label for="have-p3" class="checkbox-custom"></label>
+                            <div class="option-details">
+                                <h4>Parcial 3</h4>
+                                <p>20% de la nota final</p>
+                            </div>
+                        </div>
+                        
+                        <div class="checkbox-option prediction" data-item="p4">
+                            <input type="checkbox" id="have-p4" class="item-checkbox">
+                            <label for="have-p4" class="checkbox-custom"></label>
+                            <div class="option-details">
+                                <h4>Parcial 4</h4>
+                                <p>20% de la nota final</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="target-grade">
+                        <label for="targetGrade"><i class="fas fa-flag"></i> Nota final deseada:</label>
+                        <input type="number" id="targetGrade" step="0.01" min="0" max="5" value="3.0" required>
+                        <span>(Máximo: 5.0)</span>
+                    </div>
+                </div>
+                
+                <!-- Formulario de notas -->
+                <form id="gradeForm">
+                    <div class="form-group">
+                        <h3>Ingresa las notas que ya tienes (en escala de 0 a 5)</h3>
+                        <p>Solo se habilitarán los campos para las notas que has marcado con ✓</p>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="input-group" id="q1-group">
+                            <label for="q1">Quiz 1 <span class="weight">(5%)</span></label>
+                            <input type="number" id="q1" step="0.01" min="0" max="5" placeholder="Ej: 4.0" value="4.0">
+                        </div>
+                        
+                        <div class="input-group" id="p1-group">
+                            <label for="p1">Parcial 1 <span class="weight">(20%)</span></label>
+                            <input type="number" id="p1" step="0.01" min="0" max="5" placeholder="Ej: 3.5" value="3.5">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="input-group" id="q2-group">
+                            <label for="q2">Quiz 2 <span class="weight">(5%)</span></label>
+                            <input type="number" id="q2" step="0.01" min="0" max="5" placeholder="Ej: 4.2" value="4.2">
+                        </div>
+                        
+                        <div class="input-group" id="p2-group">
+                            <label for="p2">Parcial 2 <span class="weight">(20%)</span></label>
+                            <input type="number" id="p2" step="0.01" min="0" max="5" placeholder="Ej: 3.8" value="3.8">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="input-group" id="q3-group">
+                            <label for="q3">Quiz 3 <span class="weight">(5%)</span></label>
+                            <input type="number" id="q3" step="0.01" min="0" max="5" placeholder="Ej: 4.5" value="4.5">
+                        </div>
+                        
+                        <div class="input-group" id="p3-group">
+                            <label for="p3">Parcial 3 <span class="weight">(20%)</span></label>
+                            <input type="number" id="p3" step="0.01" min="0" max="5" placeholder="Ej: 3.2" value="3.2">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="input-group" id="q4-group">
+                            <label for="q4">Quiz 4 <span class="weight">(5%)</span></label>
+                            <input type="number" id="q4" step="0.01" min="0" max="5" placeholder="Ej: 4.0" value="4.0">
+                        </div>
+                        
+                        <div class="input-group disabled" id="p4-group">
+                            <label for="p4">Parcial 4 <span class="weight">(20%)</span></label>
+                            <input type="number" id="p4" step="0.01" min="0" max="5" placeholder="Se calculará" disabled>
+                        </div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-calculator"></i> Calcular Nota Necesaria
+                        </button>
+                        <button type="button" id="resetBtn" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i> Limpiar Todo
+                        </button>
+                        <button type="button" id="exampleBtn" class="btn btn-accent">
+                            <i class="fas fa-magic"></i> Cargar Ejemplo
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Resultado -->
+                <div id="resultContainer" class="result-container">
+                    <h3 class="result-title" id="resultTitle">Nota necesaria en el Parcial 4:</h3>
+                    <div id="resultValue" class="result-value">0.000</div>
+                    <div id="resultGrade" style="font-size: 1.2rem; color: #7f8c8d; margin-bottom: 10px;"></div>
+                    <p class="result-message" id="resultMessage"></p>
+                    <div id="resultDetails" style="margin-top: 15px; text-align: left;"></div>
+                </div>
+                
+                <div class="info-box">
+                    <h4><i class="fas fa-lightbulb"></i> Cómo usar el predictor:</h4>
+                    <p>1. <strong>Marca con ✓ las notas que ya tienes</strong> (haz clic en el recuadro).</p>
+                    <p>2. <strong>La nota sin marcar será la que predeciremos</strong> (aparecerá con un ?).</p>
+                    <p>3. Ingresa los valores de las notas que marcaste.</p>
+                    <p>4. Establece la nota final que deseas alcanzar.</p>
+                    <p>5. Haz clic en "Calcular Nota Necesaria" para ver qué necesitas en la evaluación sin marcar.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const gradeForm = document.getElementById('gradeForm');
+            const resetBtn = document.getElementById('resetBtn');
+            const exampleBtn = document.getElementById('exampleBtn');
+            const resultContainer = document.getElementById('resultContainer');
+            const resultValue = document.getElementById('resultValue');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultGrade = document.getElementById('resultGrade');
+            const resultMessage = document.getElementById('resultMessage');
+            const resultDetails = document.getElementById('resultDetails');
+            const targetGradeInput = document.getElementById('targetGrade');
+            
+            // Elementos de checkboxes y sus inputs correspondientes
+            const checkboxes = document.querySelectorAll('.item-checkbox');
+            const checkboxOptions = document.querySelectorAll('.checkbox-option');
+            
+            // Mapeo de checkboxes a inputs
+            const checkboxToInputMap = {
+                'have-q1': 'q1',
+                'have-p1': 'p1',
+                'have-q2': 'q2',
+                'have-p2': 'p2',
+                'have-q3': 'q3',
+                'have-p3': 'p3',
+                'have-q4': 'q4',
+                'have-p4': 'p4'
+            };
+            
+            // Inicializar el formulario
+            initializeForm();
+            
+            // Manejar cambio en checkboxes
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    updateInputStates();
+                    updatePredictionHighlight();
+                });
+            });
+            
+            // Manejar cambio en nota objetivo
+            targetGradeInput.addEventListener('input', function() {
+                const value = parseFloat(this.value);
+                if (value > 5) {
+                    this.value = 5;
+                } else if (value < 0) {
+                    this.value = 0;
+                }
+            });
+            
+            // Inicializar el formulario
+            function initializeForm() {
+                updateInputStates();
+                updatePredictionHighlight();
+            }
+            
+            // Actualizar estado de los campos según los checkboxes marcados
+            function updateInputStates() {
+                // Contar cuántos checkboxes están marcados
+                let checkedCount = 0;
+                
+                checkboxes.forEach(checkbox => {
+                    const inputId = checkboxToInputMap[checkbox.id];
+                    const input = document.getElementById(inputId);
+                    const group = document.getElementById(`${inputId}-group`);
+                    
+                    if (checkbox.checked) {
+                        // Si está marcado, habilitar el input
+                        input.disabled = false;
+                        group.classList.remove('disabled');
+                        checkedCount++;
+                    } else {
+                        // Si no está marcado, deshabilitar el input y limpiar su valor
+                        input.disabled = true;
+                        input.value = '';
+                        group.classList.add('disabled');
+                    }
+                });
+                
+                // Validar que haya exactamente 7 marcados (y 1 sin marcar)
+                if (checkedCount !== 7) {
+                    // Mostrar advertencia si no hay exactamente 1 sin marcar
+                    if (checkedCount === 8) {
+                        showWarning('¡Todas las notas están marcadas! Por favor, desmarca una para predecirla.');
+                    } else if (checkedCount < 7) {
+                        showWarning(`Tienes ${checkedCount} notas marcadas. Por favor, marca exactamente 7 notas (y deja 1 sin marcar para predecir).`);
+                    }
+                } else {
+                    hideWarning();
+                }
+            }
+            
+            // Actualizar resaltado de la predicción
+            function updatePredictionHighlight() {
+                // Remover la clase 'prediction' de todos
+                checkboxOptions.forEach(option => {
+                    option.classList.remove('prediction');
+                });
+                
+                // Encontrar el checkbox no marcado y añadir clase 'prediction'
+                checkboxes.forEach(checkbox => {
+                    if (!checkbox.checked) {
+                        const option = checkbox.closest('.checkbox-option');
+                        option.classList.add('prediction');
+                        
+                        // Actualizar título del resultado
+                        updateResultTitle(checkbox.id.replace('have-', ''));
+                    }
+                });
+            }
+            
+            // Mostrar advertencia
+            function showWarning(message) {
+                // Eliminar advertencia anterior si existe
+                const existingWarning = document.querySelector('.checkbox-warning');
+                if (existingWarning) {
+                    existingWarning.remove();
+                }
+                
+                // Crear nueva advertencia
+                const warning = document.createElement('div');
+                warning.className = 'checkbox-warning';
+                warning.innerHTML = `
+                    <div style="background-color: #f8d7da; color: #721c24; padding: 12px 15px; border-radius: 6px; border-left: 4px solid #f5c6cb; margin-top: 10px;">
+                        <p style="margin: 0; display: flex; align-items: center;">
+                            <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>
+                            <strong>${message}</strong>
+                        </p>
+                    </div>
+                `;
+                
+                // Insertar después del checkbox-grid
+                const checkboxGrid = document.querySelector('.checkbox-grid');
+                checkboxGrid.parentNode.insertBefore(warning, checkboxGrid.nextSibling);
+            }
+            
+            // Ocultar advertencia
+            function hideWarning() {
+                const existingWarning = document.querySelector('.checkbox-warning');
+                if (existingWarning) {
+                    existingWarning.remove();
+                }
+            }
+            
+            // Actualizar título del resultado según predicción
+            function updateResultTitle(predictionId) {
+                const predictionNames = {
+                    'q1': 'Quiz 1',
+                    'q2': 'Quiz 2', 
+                    'q3': 'Quiz 3',
+                    'q4': 'Quiz 4',
+                    'p1': 'Parcial 1',
+                    'p2': 'Parcial 2',
+                    'p3': 'Parcial 3',
+                    'p4': 'Parcial 4'
+                };
+                
+                const predictionWeights = {
+                    'q1': '5%',
+                    'q2': '5%', 
+                    'q3': '5%',
+                    'q4': '5%',
+                    'p1': '20%',
+                    'p2': '20%',
+                    'p3': '20%',
+                    'p4': '20%'
+                };
+                
+                resultTitle.textContent = `Nota necesaria en ${predictionNames[predictionId]} (${predictionWeights[predictionId]}):`;
+            }
+            
+            // Obtener la predicción actual (checkbox no marcado)
+            function getCurrentPrediction() {
+                let prediction = null;
+                checkboxes.forEach(checkbox => {
+                    if (!checkbox.checked) {
+                        prediction = checkbox.id.replace('have-', '');
+                    }
+                });
+                return prediction;
+            }
+            
+            // Manejar el envío del formulario
+            gradeForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Obtener la predicción actual
+                const prediction = getCurrentPrediction();
+                
+                // Validar que haya exactamente una predicción
+                if (!prediction) {
+                    alert('Por favor, desmarca exactamente una nota para predecir (deja una sin ✓).');
+                    return;
+                }
+                
+                // Obtener nota objetivo
+                const targetGrade = parseFloat(targetGradeInput.value) || 3.0;
+                
+                // Validar nota objetivo
+                if (targetGrade < 0 || targetGrade > 5) {
+                    alert('La nota objetivo debe estar entre 0.0 y 5.0');
+                    targetGradeInput.focus();
+                    return;
+                }
+                
+                // Obtener valores de los inputs (solo los que están marcados/habilitados)
+                const q1 = document.getElementById('q1').disabled ? 0 : parseFloat(document.getElementById('q1').value) || 0;
+                const p1 = document.getElementById('p1').disabled ? 0 : parseFloat(document.getElementById('p1').value) || 0;
+                const q2 = document.getElementById('q2').disabled ? 0 : parseFloat(document.getElementById('q2').value) || 0;
+                const p2 = document.getElementById('p2').disabled ? 0 : parseFloat(document.getElementById('p2').value) || 0;
+                const q3 = document.getElementById('q3').disabled ? 0 : parseFloat(document.getElementById('q3').value) || 0;
+                const p3 = document.getElementById('p3').disabled ? 0 : parseFloat(document.getElementById('p3').value) || 0;
+                const q4 = document.getElementById('q4').disabled ? 0 : parseFloat(document.getElementById('q4').value) || 0;
+                const p4 = document.getElementById('p4').disabled ? 0 : parseFloat(document.getElementById('p4').value) || 0;
+                
+                // Validar que las notas estén entre 0 y 5
+                const inputs = [
+                    {id: 'q1', value: q1, enabled: !document.getElementById('q1').disabled},
+                    {id: 'p1', value: p1, enabled: !document.getElementById('p1').disabled},
+                    {id: 'q2', value: q2, enabled: !document.getElementById('q2').disabled},
+                    {id: 'p2', value: p2, enabled: !document.getElementById('p2').disabled},
+                    {id: 'q3', value: q3, enabled: !document.getElementById('q3').disabled},
+                    {id: 'p3', value: p3, enabled: !document.getElementById('p3').disabled},
+                    {id: 'q4', value: q4, enabled: !document.getElementById('q4').disabled},
+                    {id: 'p4', value: p4, enabled: !document.getElementById('p4').disabled}
+                ];
+                
+                let isValid = true;
+                let filledCount = 0;
+                
+                inputs.forEach(input => {
+                    const inputElement = document.getElementById(input.id);
+                    if (input.enabled) {
+                        if (input.value < 0 || input.value > 5) {
+                            inputElement.classList.add('invalid');
+                            isValid = false;
+                        } else {
+                            inputElement.classList.remove('invalid');
+                            if (input.value > 0 || inputElement.value !== '') {
+                                filledCount++;
+                            }
+                        }
+                    }
+                });
+                
+                if (!isValid) {
+                    alert('Por favor, ingresa notas válidas entre 0.0 y 5.0');
+                    return;
+                }
+                
+                // Calcular la suma de notas con sus pesos
+                // Quizzes: 5% cada uno (0.05)
+                // Parciales: 20% cada uno (0.20)
+                const totalQuizzesWeight = (q1 + q2 + q3 + q4) * 0.05;
+                const totalParcialesWeight = (p1 + p2 + p3 + p4) * 0.20;
+                const currentTotal = totalQuizzesWeight + totalParcialesWeight;
+                
+                // Calcular la nota necesaria según la predicción
+                let neededGrade = 0;
+                
+                // Determinar el peso de la nota que se está prediciendo
+                const isQuiz = prediction.startsWith('q');
+                const predictionWeight = isQuiz ? 0.05 : 0.20;
+                
+                // Calcular la nota necesaria
+                neededGrade = (targetGrade - currentTotal) / predictionWeight;
+                
+                // Mostrar resultado
+                resultValue.textContent = neededGrade.toFixed(3);
+                resultGrade.textContent = `En escala de 0 a 5`;
+                
+                // Añadir mensaje contextual
+                let message = '';
+                let details = '';
+                
+                if (neededGrade > 5) {
+                    message = '¡Necesitas más de 5.0! Es imposible alcanzar tu meta con las notas actuales.';
+                    resultValue.style.color = '#e74c3c';
+                } else if (neededGrade < 0) {
+                    message = '¡Ya has superado tu meta! Incluso con 0 en esta evaluación la alcanzarías.';
+                    resultValue.style.color = '#2ecc71';
+                    neededGrade = 0; // No puede ser negativa
+                    resultValue.textContent = '0.000';
+                } else if (neededGrade >= 4.5) {
+                    message = 'Necesitas una excelente nota. ¡Esfuérzate al máximo!';
+                    resultValue.style.color = '#e74c3c';
+                } else if (neededGrade >= 3.5) {
+                    message = 'Requieres un buen desempeño. ¡Puedes lograrlo con dedicación!';
+                    resultValue.style.color = '#f39c12';
+                } else if (neededGrade >= 2.5) {
+                    message = 'Tienes un objetivo alcanzable. ¡Sigue así!';
+                    resultValue.style.color = '#3498db';
+                } else {
+                    message = '¡Vas por buen camino! Con un desempeño adecuado alcanzarás tu meta.';
+                    resultValue.style.color = '#2ecc71';
+                }
+                
+                // Calcular detalles adicionales
+                const currentPercentage = (currentTotal / 5) * 100;
+                const neededPercentage = (neededGrade / 5) * 100;
+                const maxWithPrediction = currentTotal + (5.0 * predictionWeight);
+                const maxPercentage = (maxWithPrediction / 5) * 100;
+                
+                details = `
+                    <div style="background-color: #fff; padding: 15px; border-radius: 8px; margin-top: 10px;">
+                        <h4 style="color: var(--primary-color); margin-bottom: 10px;">Detalles del cálculo:</h4>
+                        <p><strong>Nota actual acumulada:</strong> ${currentTotal.toFixed(2)} / 5.0 (${currentPercentage.toFixed(1)}%)</p>
+                        <p><strong>Nota objetivo:</strong> ${targetGrade.toFixed(2)} / 5.0</p>
+                        <p><strong>Nota necesaria en ${getPredictionName(prediction)}:</strong> ${neededGrade.toFixed(2)} / 5.0 (${neededPercentage.toFixed(1)}%)</p>
+                        <p><strong>Nota máxima posible:</strong> ${maxWithPrediction.toFixed(2)} / 5.0 (${maxPercentage.toFixed(1)}%)</p>
+                    </div>
+                `;
+                
+                resultMessage.textContent = message;
+                resultDetails.innerHTML = details;
+                
+                // Mostrar el contenedor de resultados
+                resultContainer.classList.add('show');
+                
+                // Guardar en el historial
+                saveToHistory(prediction, targetGrade, q1, p1, q2, p2, q3, p3, q4, p4, neededGrade);
+            });
+            
+            // Función para obtener el nombre de la predicción
+            function getPredictionName(prediction) {
+                const names = {
+                    'q1': 'Quiz 1',
+                    'q2': 'Quiz 2', 
+                    'q3': 'Quiz 3',
+                    'q4': 'Quiz 4',
+                    'p1': 'Parcial 1',
+                    'p2': 'Parcial 2',
+                    'p3': 'Parcial 3',
+                    'p4': 'Parcial 4'
+                };
+                return names[prediction] || 'la evaluación';
+            }
+            
+            // Manejar el botón de reset
+            resetBtn.addEventListener('click', function() {
+                gradeForm.reset();
+                targetGradeInput.value = 3.0;
+                resultContainer.classList.remove('show');
+                
+                // Restablecer colores de borde
+                const inputs = document.querySelectorAll('input[type="number"]');
+                inputs.forEach(input => {
+                    input.classList.remove('invalid');
+                });
+                
+                // Restablecer checkboxes (marcar todos excepto p4)
+                checkboxes.forEach(checkbox => {
+                    if (checkbox.id !== 'have-p4') {
+                        checkbox.checked = true;
+                    } else {
+                        checkbox.checked = false;
+                    }
+                });
+                
+                // Restablecer valores de ejemplo
+                document.getElementById('q1').value = '4.0';
+                document.getElementById('p1').value = '3.5';
+                document.getElementById('q2').value = '4.2';
+                document.getElementById('p2').value = '3.8';
+                document.getElementById('q3').value = '4.5';
+                document.getElementById('p3').value = '3.2';
+                document.getElementById('q4').value = '4.0';
+                document.getElementById('p4').value = '';
+                
+                // Actualizar estado de los campos
+                updateInputStates();
+                updatePredictionHighlight();
+                
+                // Ocultar advertencia
+                hideWarning();
+            });
+            
+            // Manejar el botón de ejemplo
+            exampleBtn.addEventListener('click', function() {
+                // Cargar datos de ejemplo diferentes
+                document.getElementById('q1').value = 4.5;
+                document.getElementById('p1').value = 3.8;
+                document.getElementById('q2').value = 4.0;
+                document.getElementById('p2').value = 3.2;
+                document.getElementById('q3').value = 4.3;
+                document.getElementById('p3').value = 3.5;
+                document.getElementById('q4').value = 4.1;
+                
+                // Desmarcar Q2 para predecirlo
+                checkboxes.forEach(checkbox => {
+                    if (checkbox.id === 'have-q2') {
+                        checkbox.checked = false;
+                    } else {
+                        checkbox.checked = true;
+                    }
+                });
+                
+                targetGradeInput.value = 3.5;
+                
+                // Actualizar estado
+                updateInputStates();
+                updatePredictionHighlight();
+                
+                // Quitar clases de error
+                const inputs = document.querySelectorAll('input[type="number"]');
+                inputs.forEach(input => {
+                    input.classList.remove('invalid');
+                });
+                
+                // Mostrar mensaje
+                alert('Ejemplo cargado. Se predice la nota del Quiz 2. Haz clic en "Calcular Nota Necesaria" para ver el resultado.');
+            });
+            
+            // Función para guardar en el historial (simulación)
+            function saveToHistory(prediction, target, q1, p1, q2, p2, q3, p3, q4, p4, result) {
+                // En una aplicación real, aquí se guardaría en localStorage o se enviaría a un servidor
+                console.log('Cálculo guardado en historial:', {
+                    prediccion: prediction,
+                    objetivo: target,
+                    notas: { q1, p1, q2, p2, q3, p3, q4, p4 },
+                    resultado: result,
+                    fecha: new Date().toLocaleString()
+                });
+            }
+            
+            // Navegación del menú lateral
+            document.querySelectorAll('.nav-menu a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Quitar clase active de todos los enlaces
+                    document.querySelectorAll('.nav-menu a').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    
+                    // Añadir clase active al enlace clickeado
+                    this.classList.add('active');
+                    
+                    // En una aplicación real, aquí cargaríamos el contenido correspondiente
+                    const section = this.getAttribute('href').substring(1);
+                    showSection(section);
+                });
+            });
+            
+            // Función para mostrar secciones (simulación)
+            function showSection(section) {
+                let title = '';
+                let message = '';
+                
+                switch(section) {
+                    case 'calculadora':
+                        title = 'Predictor de Notas con Checkboxes';
+                        message = 'Marca las notas que ya tienes, la que queda sin marcar será la predicción';
+                        break;
+                    case 'instrucciones':
+                        title = 'Instrucciones de Uso';
+                        message = 'Aprende a usar correctamente el predictor de notas';
+                        break;
+                    case 'formula':
+                        title = 'Explicación de las Fórmulas';
+                        message = 'Comprende cómo se calculan las notas necesarias';
+                        break;
+                    case 'historial':
+                        title = 'Historial de Cálculos';
+                        message = 'Revisa tus predicciones anteriores';
+                        break;
+                }
+                
+                document.querySelector('.header-title h2').textContent = title;
+                document.querySelector('.header-title p').textContent = message;
+                
+                // En una aplicación real, aquí cargaríamos el contenido dinámico
+                if (section !== 'calculadora') {
+                    const contentDiv = document.querySelector('.content');
+                    contentDiv.innerHTML = `
+                        <div class="calculator-container">
+                            <div class="calculator-title">
+                                <i class="fas fa-${getIconForSection(section)}"></i>
+                                <h2>${title}</h2>
+                            </div>
+                            <div class="info-box">
+                                <h4><i class="fas fa-info-circle"></i> Información:</h4>
+                                <p>Esta sección está en desarrollo. En una aplicación completa, aquí se mostraría el contenido de "${title}".</p>
+                                <p>Por ahora, utiliza el predictor de notas para determinar qué necesitas en tus evaluaciones.</p>
+                            </div>
+                            <div style="margin-top: 20px; text-align: center;">
+                                <button id="backToCalculator" class="btn btn-accent">
+                                    <i class="fas fa-calculator"></i> Volver al Predictor
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Agregar funcionalidad al botón de volver
+                    document.getElementById('backToCalculator').addEventListener('click', function() {
+                        document.querySelectorAll('.nav-menu a').forEach(item => {
+                            item.classList.remove('active');
+                        });
+                        document.querySelector('.nav-menu a[href="#calculadora"]').classList.add('active');
+                        showSection('calculadora');
+                        location.reload(); // Recargar para restaurar la calculadora
+                    });
+                }
+            }
+            
+            // Función auxiliar para obtener iconos según la sección
+            function getIconForSection(section) {
+                switch(section) {
+                    case 'instrucciones': return 'info-circle';
+                    case 'formula': return 'square-root-alt';
+                    case 'historial': return 'history';
+                    default: return 'calculator';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
